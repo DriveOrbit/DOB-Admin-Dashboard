@@ -43,13 +43,15 @@ export default function LoginPage() {
             return;
         }
 
-        // For demo purposes, we'll simulate getting a Firebase ID token
-        // In a real implementation, you would use Firebase Auth SDK
-        const mockFirebaseIdToken = `firebase_token_${Date.now()}_${email}`;
+        console.log('Starting login process with:', { email });
+        const success = await login(email, password);
+        console.log('Login result:', success);
 
-        const success = await login(mockFirebaseIdToken);
         if (success) {
+            console.log('Login successful, redirecting to dashboard...');
             router.push('/dashboard');
+        } else {
+            console.log('Login failed, staying on login page');
         }
     };
 

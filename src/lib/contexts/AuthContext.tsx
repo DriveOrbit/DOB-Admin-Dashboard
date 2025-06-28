@@ -7,7 +7,7 @@ import { authService } from '../services/auth';
 interface AuthContextType {
     user: User | null;
     loading: boolean;
-    login: (idToken: string) => Promise<boolean>;
+    login: (email: string, password: string) => Promise<boolean>;
     signup: (email: string, password: string, fullName: string, role?: string) => Promise<boolean>;
     logout: () => void;
     error: string | null;
@@ -38,21 +38,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         initAuth();
     }, []);
 
-    const login = async (idToken: string): Promise<boolean> => {
+    const login = async (email: string, password: string): Promise<boolean> => {
         setLoading(true);
         setError(null);
 
         try {
-            const response = await authService.login({ idToken });
+            const response = await authService.login({ email, password });
 
-            if (response.success && response.user) {
-                setUser(response.user);
+            if (response.success) {
+                // If user object is provided, use it; otherwise try to fetch profile
+                if (response.user) {
+                    setUser(response.user);
+                } else if (authService.isAuthenticated()) {
+                    // Try to fetch user profile after successful login
+                    const profile = await authService.getProfile();
+                    if (profile) {
+                        setUser(profile);
+                    }
+                }
                 return true;
             } else {
                 setError(response.message || 'Login failed');
                 return false;
             }
         } catch (error) {
+            console.error('Login error in AuthContext:', error);
             setError(error instanceof Error ? error.message : 'An error occurred');
             return false;
         } finally {
