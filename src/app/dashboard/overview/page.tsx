@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
-export default function DashboardPage() {
+export default function OverviewPage() {
     const { user, loading } = useAuth();
     const router = useRouter();
 
@@ -22,23 +22,17 @@ export default function DashboardPage() {
         );
     }
 
-    if (!user) {
-        return null;
-    }
+    if (!user) return null;
 
     return (
         <div className="p-6">
             <div className="mb-6">
-                <h1 className="text-2xl font-bold text-white mb-2">
-                    Welcome to DriveOrbit Admin Dashboard
-                </h1>
-                <p className="text-gray-400">
-                    Hello {user.fullName}, you are logged in as <span className="text-blue-400 font-semibold">{user.role}</span>
-                </p>
+                <h1 className="text-2xl font-bold text-white mb-2">Overview</h1>
+                <p className="text-gray-400">Get insights into your DriveOrbit system</p>
             </div>
 
-            {/* Quick Stats */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                {/* Stats Cards */}
                 <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 border border-gray-700/50">
                     <div className="flex items-center justify-between">
                         <div>
@@ -112,17 +106,6 @@ export default function DashboardPage() {
                             <p className="text-gray-400 text-sm">John Smith - Advanced Safety Course</p>
                         </div>
                         <span className="text-gray-400 text-sm">4 hours ago</span>
-                    </div>
-
-                    <div className="flex items-center space-x-4 p-4 bg-gray-700/30 rounded-lg">
-                        <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
-                            <span className="text-white font-semibold">M</span>
-                        </div>
-                        <div className="flex-1">
-                            <p className="text-white font-medium">Maintenance completed</p>
-                            <p className="text-gray-400 text-sm">Honda Accord - Routine service</p>
-                        </div>
-                        <span className="text-gray-400 text-sm">6 hours ago</span>
                     </div>
                 </div>
             </div>
