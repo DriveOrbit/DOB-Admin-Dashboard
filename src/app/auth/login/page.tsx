@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/contexts/AuthContext';
 import { Button } from '@/components/ui/Button';
 import { InputField } from '@/components/ui/InputField';
 import { Alert } from '@/components/ui/Alert';
 import { Logo } from '@/components/ui/Logo';
+import { handlePostLoginRedirect } from '@/lib/utils/navigation';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
@@ -15,6 +16,7 @@ export default function LoginPage() {
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const { login, loading, error, clearError } = useAuth();
     const router = useRouter();
+    const searchParams = useSearchParams();
 
     const validateForm = () => {
         const newErrors: { [key: string]: string } = {};
@@ -48,8 +50,13 @@ export default function LoginPage() {
         console.log('Login result:', success);
 
         if (success) {
-            console.log('Login successful, redirecting to dashboard...');
-            router.push('/dashboard');
+            console.log('Login successful, redirecting...');
+            // Get redirect URL from query params or default to dashboard
+            const redirectTo = searchParams.get('redirect') || '/dashboard';
+            console.log('Redirecting to:', redirectTo);
+
+            // Use replace to prevent back button issues
+            router.replace(redirectTo);
         } else {
             console.log('Login failed, staying on login page');
         }
@@ -82,8 +89,9 @@ export default function LoginPage() {
                     <div className="space-y-4">
                         {error && (
                             <Alert
-                                type="error"
-                                message={error}
+                                type="danger"
+                                title="Login Failed"
+                                description={error}
                                 onClose={clearError}
                             />
                         )}

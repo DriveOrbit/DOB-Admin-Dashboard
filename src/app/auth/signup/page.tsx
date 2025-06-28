@@ -111,8 +111,9 @@ export default function SignupPage() {
                     <div className="space-y-4">
                         {error && (
                             <Alert
-                                type="error"
-                                message={error}
+                                type="danger"
+                                title="Signup Failed"
+                                description={error}
                                 onClose={clearError}
                             />
                         )}
@@ -120,7 +121,8 @@ export default function SignupPage() {
                         {success && (
                             <Alert
                                 type="success"
-                                message="Account created successfully! Redirecting to login..."
+                                title="Account Created!"
+                                description="Account created successfully! Redirecting to login..."
                             />
                         )}
 

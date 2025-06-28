@@ -8,47 +8,61 @@ class AuthService {
 
     async signup(data: SignupRequest): Promise<AuthResponse> {
         try {
-            console.log('Starting signup process...');
+            console.log('Starting signup process for:', data.email);
 
-            // First, create user in Firebase
+            // First, create user in Firebase to get ID token
+            console.log('Creating Firebase user...');
             const firebaseResult = await signUpWithFirebase(data.email, data.password);
 
             if (!firebaseResult.success) {
+                console.error('Firebase signup failed:', firebaseResult.error);
+                let errorMessage = firebaseResult.error || 'Firebase signup failed';
+                if (firebaseResult.error?.includes('EMAIL_EXISTS') || firebaseResult.error?.includes('email-already-in-use')) {
+                    errorMessage = 'An account with this email address already exists. Please use a different email or try logging in instead.';
+                }
                 return {
                     success: false,
-                    message: firebaseResult.error || 'Firebase signup failed',
+                    message: errorMessage,
                 };
             }
 
-            console.log('Firebase signup successful, verifying with backend...');
+            console.log('Firebase signup successful, registering with backend...');
 
             // Ensure we have the ID token
             if (!firebaseResult.idToken) {
                 throw new Error('Failed to get Firebase ID token');
             }
 
-            // Then verify with backend using Firebase ID token
+            // For signup, send only the ID token (like login)
+            // The user data will be extracted from the Firebase token by the backend
+            const backendData = {
+                idToken: firebaseResult.idToken
+            };
+
+            console.log('Sending to backend:', JSON.stringify(backendData, null, 2));
+
+            // Register with backend using Firebase ID token
             const response = await fetch(`${this.baseUrl}${this.endpoints.signup}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${firebaseResult.idToken}`,
                 },
-                body: JSON.stringify({
-                    ...data,
-                    idToken: firebaseResult.idToken,
-                }),
+                body: JSON.stringify(backendData),
             });
 
+            console.log('Backend response status:', response.status);
             const result = await response.json();
+            console.log('Backend response data:', result);
 
             if (!response.ok) {
-                throw new Error(result.message || 'Backend verification failed');
+                throw new Error(result.message || 'Backend registration failed');
             }
 
-            // Store token in localStorage
+            // Store token in localStorage if returned
             if (result.token) {
                 localStorage.setItem('authToken', result.token);
+                console.log('Auth token stored in localStorage');
             }
 
             return {
@@ -66,12 +80,14 @@ class AuthService {
 
     async login(data: LoginRequest): Promise<AuthResponse> {
         try {
-            console.log('Starting login process...');
+            console.log('Starting login process for:', data.email);
 
-            // First, authenticate with Firebase
+            // First, authenticate with Firebase to get ID token
+            console.log('Authenticating with Firebase...');
             const firebaseResult = await signInWithFirebase(data.email, data.password);
 
             if (!firebaseResult.success) {
+                console.error('Firebase login failed:', firebaseResult.error);
                 return {
                     success: false,
                     message: firebaseResult.error || 'Firebase authentication failed',
@@ -85,10 +101,12 @@ class AuthService {
                 throw new Error('Failed to get Firebase ID token');
             }
 
-            // Then verify with backend using Firebase ID token
+            // Send ID token to backend for verification
             const backendData: LoginBackendRequest = {
                 idToken: firebaseResult.idToken,
             };
+
+            console.log('Sending ID token to backend for verification...');
 
             const response = await fetch(`${this.baseUrl}${this.endpoints.login}`, {
                 method: 'POST',
@@ -99,6 +117,7 @@ class AuthService {
                 body: JSON.stringify(backendData),
             });
 
+            console.log('Backend response status:', response.status);
             const result = await response.json();
             console.log('Backend login response:', result);
 
@@ -134,11 +153,14 @@ class AuthService {
 
     async getProfile(): Promise<User | null> {
         try {
+            console.log('AuthService: Getting profile...');
             const token = localStorage.getItem('authToken');
             if (!token) {
+                console.log('AuthService: No auth token found');
                 throw new Error('No authentication token found');
             }
 
+            console.log('AuthService: Found token, making API request...');
             const response = await fetch(`${this.baseUrl}${this.endpoints.profile}`, {
                 method: 'GET',
                 headers: {
@@ -147,11 +169,14 @@ class AuthService {
                 },
             });
 
+            console.log('AuthService: Profile API response status:', response.status);
+
             if (!response.ok) {
                 throw new Error('Failed to fetch profile');
             }
 
             const result = await response.json();
+            console.log('AuthService: Profile API result:', result);
             return result.user || result;
         } catch (error) {
             console.error('Error fetching profile:', error);

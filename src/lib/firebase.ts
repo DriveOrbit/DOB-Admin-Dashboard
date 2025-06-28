@@ -37,13 +37,35 @@ export async function signInWithFirebase(email: string, password: string): Promi
 
 export async function signUpWithFirebase(email: string, password: string): Promise<{ success: true; idToken: string; user: any } | { success: false; error: string }> {
   try {
-    console.log('Attempting Firebase sign up...');
+    console.log('Attempting Firebase sign up for email:', email);
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const idToken = await userCredential.user.getIdToken();
     console.log('Firebase sign up successful, got ID token');
     return { success: true, idToken, user: userCredential.user };
   } catch (error: any) {
     console.error('Firebase sign up error:', error);
-    return { success: false, error: error.message };
+    console.error('Error code:', error.code);
+    console.error('Error message:', error.message);
+
+    // Handle specific Firebase error codes
+    let friendlyMessage = error.message;
+    switch (error.code) {
+      case 'auth/email-already-in-use':
+        friendlyMessage = 'An account with this email address already exists. Please try logging in instead.';
+        break;
+      case 'auth/weak-password':
+        friendlyMessage = 'Password is too weak. Please use a stronger password.';
+        break;
+      case 'auth/invalid-email':
+        friendlyMessage = 'Invalid email address format.';
+        break;
+      case 'auth/operation-not-allowed':
+        friendlyMessage = 'Email/password accounts are not enabled. Please contact support.';
+        break;
+      default:
+        friendlyMessage = error.message || 'Failed to create account';
+    }
+
+    return { success: false, error: friendlyMessage };
   }
 }
