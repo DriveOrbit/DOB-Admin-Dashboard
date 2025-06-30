@@ -88,7 +88,7 @@ export const DesktopSidebar = ({
     <>
       <motion.div
         className={cn(
-          "h-full px-4 py-4 hidden  md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 w-[300px] shrink-0",
+          "h-full px-4 py-4 hidden md:flex md:flex-col bg-gray-800/80 backdrop-blur-sm border-r border-gray-700/50 w-[300px] shrink-0",
           className
         )}
         animate={{
@@ -114,13 +114,14 @@ export const MobileSidebar = ({
     <>
       <div
         className={cn(
-          "h-10 px-4 py-4 flex flex-row md:hidden  items-center justify-between bg-neutral-100 dark:bg-neutral-800 w-full"
+          "h-10 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-gray-800/80 backdrop-blur-sm border-b border-gray-700/50 w-full"
         )}
         {...props}
       >
-        <div className="flex justify-end z-20 w-full">
+        <div className="flex justify-between items-center z-20 w-full">
+          <span className="text-lg font-bold text-white">DriveOrbit</span>
           <IconMenu2
-            className="text-gray-300"
+            className="text-gray-300 h-6 w-6 cursor-pointer hover:text-white transition-colors"
             onClick={() => setOpen(!open)}
           />
         </div>
@@ -135,15 +136,15 @@ export const MobileSidebar = ({
                 ease: "easeInOut",
               }}
               className={cn(
-                "fixed h-full w-full inset-0 bg-white dark:bg-neutral-900 p-10 z-[100] flex flex-col justify-between",
+                "fixed h-full w-full inset-0 bg-gray-900/95 backdrop-blur-md p-10 z-[100] flex flex-col justify-between",
                 className
               )}
             >
               <div
-                className="absolute right-10 top-10 z-50 text-gray-300"
+                className="absolute right-10 top-10 z-50 text-gray-300 cursor-pointer hover:text-white transition-colors"
                 onClick={() => setOpen(!open)}
               >
-                <IconX />
+                <IconX className="h-6 w-6" />
               </div>
               {children}
             </motion.div>
@@ -169,7 +170,7 @@ export const SidebarLink = ({
     <a
       href={link.href}
       className={cn(
-        "flex items-center justify-start gap-2 group/sidebar py-2 px-2 rounded-lg transition-colors",
+        "flex items-center justify-start gap-2 group/sidebar py-3 px-2 rounded-lg transition-colors touch-manipulation",
         isActive
           ? "bg-blue-600/20 text-blue-400 border-l-2 border-blue-500"
           : "hover:bg-gray-700/50 text-gray-300",

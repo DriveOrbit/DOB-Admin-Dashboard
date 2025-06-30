@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/contexts/AuthContext';
+import GoogleMap from '@/components/ui/GoogleMap';
 
 export default function DashboardPage() {
     const { user, loading } = useAuth();
@@ -66,11 +67,11 @@ export default function DashboardPage() {
                 <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 border border-gray-700/50">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-gray-400 text-sm">Total Revenue</p>
-                            <p className="text-2xl font-bold text-white">$12,450</p>
+                            <p className="text-gray-400 text-sm">Vehicles on the Way</p>
+                            <p className="text-2xl font-bold text-white">42</p>
                         </div>
-                        <div className="p-3 bg-purple-600/20 rounded-lg">
-                            <div className="w-6 h-6 bg-purple-500 rounded"></div>
+                        <div className="p-3 bg-orange-600/20 rounded-lg">
+                            <div className="w-6 h-6 bg-orange-500 rounded"></div>
                         </div>
                     </div>
                 </div>
@@ -88,41 +89,22 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            {/* Recent Activity */}
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700/50 p-6">
-                <h2 className="text-xl font-semibold text-white mb-4">Recent Activity</h2>
-                <div className="space-y-4">
-                    <div className="flex items-center space-x-4 p-4 bg-gray-700/30 rounded-lg">
-                        <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                            <span className="text-white font-semibold">V</span>
+            {/* Vehicle Tracking Map */}
+            <div className="mb-8">
+                <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700/50 p-6">
+                    <div className="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 className="text-xl font-semibold text-white">Live Vehicle Tracking</h2>
+                            <p className="text-gray-400 text-sm">Real-time location of your fleet</p>
                         </div>
-                        <div className="flex-1">
-                            <p className="text-white font-medium">New vehicle registered</p>
-                            <p className="text-gray-400 text-sm">Toyota Camry - License: ABC-123</p>
+                        <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                            <span className="text-green-400 text-sm">Live</span>
                         </div>
-                        <span className="text-gray-400 text-sm">2 hours ago</span>
                     </div>
 
-                    <div className="flex items-center space-x-4 p-4 bg-gray-700/30 rounded-lg">
-                        <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                            <span className="text-white font-semibold">D</span>
-                        </div>
-                        <div className="flex-1">
-                            <p className="text-white font-medium">Driver completed training</p>
-                            <p className="text-gray-400 text-sm">John Smith - Advanced Safety Course</p>
-                        </div>
-                        <span className="text-gray-400 text-sm">4 hours ago</span>
-                    </div>
-
-                    <div className="flex items-center space-x-4 p-4 bg-gray-700/30 rounded-lg">
-                        <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
-                            <span className="text-white font-semibold">M</span>
-                        </div>
-                        <div className="flex-1">
-                            <p className="text-white font-medium">Maintenance completed</p>
-                            <p className="text-gray-400 text-sm">Honda Accord - Routine service</p>
-                        </div>
-                        <span className="text-gray-400 text-sm">6 hours ago</span>
+                    <div className="h-96 rounded-lg overflow-hidden">
+                        <GoogleMap className="h-full w-full" />
                     </div>
                 </div>
             </div>
