@@ -9,8 +9,24 @@ export default function OverviewPage() {
     const router = useRouter();
 
     useEffect(() => {
+        // Only redirect to login if we're certain the user is not authenticated
+        // Wait for loading to complete and ensure we don't have a token
         if (!loading && !user) {
-            router.push('/auth/login');
+            // Double-check if we have a token in localStorage
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                console.log('Overview Page: No user and no token, redirecting to login');
+                router.push('/auth/login');
+            } else {
+                console.log('Overview Page: No user but token exists, waiting for auth to initialize');
+                // Give AuthContext more time to initialize
+                setTimeout(() => {
+                    if (!user) {
+                        console.log('Overview Page: Still no user after waiting, redirecting to login');
+                        router.push('/auth/login');
+                    }
+                }, 1000);
+            }
         }
     }, [user, loading, router]);
 

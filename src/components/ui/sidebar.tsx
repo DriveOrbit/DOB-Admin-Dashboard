@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import React, { useState, createContext, useContext } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { IconMenu2, IconX } from "@tabler/icons-react";
+import Link from "next/link";
 
 interface Links {
   label: string;
@@ -167,7 +168,7 @@ export const SidebarLink = ({
 }) => {
   const { open, animate } = useSidebar();
   return (
-    <a
+    <Link
       href={link.href}
       className={cn(
         "flex items-center justify-start gap-2 group/sidebar py-3 px-2 rounded-lg transition-colors touch-manipulation",
@@ -194,6 +195,6 @@ export const SidebarLink = ({
       >
         {link.label}
       </motion.span>
-    </a>
+    </Link>
   );
 };
