@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/contexts/AuthContext';
@@ -14,9 +14,26 @@ export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
-    const { login, loading, error, clearError } = useAuth();
+    const { login, loading, error, clearError, user } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
+
+    // Debug: Log authentication state changes
+    useEffect(() => {
+        console.log('Login page - Auth state:', {
+            user: user ? { id: user.id, email: user.email, role: user.role } : null,
+            loading,
+            error
+        });
+    }, [user, loading, error]);
+
+    // Redirect to dashboard if already logged in
+    useEffect(() => {
+        if (!loading && user) {
+            console.log('Login page - User already authenticated, redirecting to dashboard');
+            router.push('/dashboard');
+        }
+    }, [user, loading, router]);
 
     const validateForm = () => {
         const newErrors: { [key: string]: string } = {};
@@ -51,12 +68,10 @@ export default function LoginPage() {
 
         if (success) {
             console.log('Login successful, redirecting...');
-            // Get redirect URL from query params or default to dashboard
-            const redirectTo = searchParams.get('redirect') || '/dashboard';
-            console.log('Redirecting to:', redirectTo);
 
-            // Use replace to prevent back button issues
-            router.replace(redirectTo);
+            // Use Next.js router instead of window.location to preserve state
+            console.log('Attempting redirect to /dashboard using router.push');
+            router.push('/dashboard');
         } else {
             console.log('Login failed, staying on login page');
         }

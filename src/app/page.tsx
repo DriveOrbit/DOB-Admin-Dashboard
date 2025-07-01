@@ -9,12 +9,18 @@ export default function Home() {
     const router = useRouter();
 
     useEffect(() => {
+        console.log('Home page - Auth state changed:', { user: !!user, loading, userObject: user });
+
         if (!loading) {
             if (user) {
+                console.log('Home page - User found, redirecting to dashboard');
                 router.push('/dashboard');
             } else {
+                console.log('Home page - No user, redirecting to login');
                 router.push('/auth/login');
             }
+        } else {
+            console.log('Home page - Still loading, waiting...');
         }
     }, [user, loading, router]);
 

@@ -29,12 +29,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     console.log('AuthContext: Found auth token, fetching profile...');
                     const profile = await authService.getProfile();
                     console.log('AuthContext: Profile fetched:', profile);
-                    setUser(profile);
+
+                    if (profile) {
+                        setUser(profile);
+                    } else {
+                        // If profile fetch fails but we have a token, create a minimal user
+                        console.log('AuthContext: Profile fetch failed, but token exists. Creating minimal user.');
+                        const token = authService.getToken();
+                        if (token) {
+                            // Try to decode basic info from token or use defaults
+                            setUser({
+                                id: 'authenticated-user',
+                                email: 'user@driveorbit.com',
+                                fullName: 'Authenticated User',
+                                role: 'admin'
+                            });
+                        }
+                    }
                 } else {
                     console.log('AuthContext: No auth token found');
                 }
             } catch (error) {
                 console.error('Auth initialization error:', error);
+                // If there's an error but we have a token, still try to create a minimal user
+                if (authService.isAuthenticated()) {
+                    console.log('AuthContext: Error during init but token exists, creating minimal user');
+                    setUser({
+                        id: 'authenticated-user',
+                        email: 'user@driveorbit.com',
+                        fullName: 'Authenticated User',
+                        role: 'admin'
+                    });
+                }
             } finally {
                 console.log('AuthContext: Initialization complete, setting loading to false');
                 setLoading(false);

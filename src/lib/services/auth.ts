@@ -157,7 +157,7 @@ class AuthService {
             const token = localStorage.getItem('authToken');
             if (!token) {
                 console.log('AuthService: No auth token found');
-                throw new Error('No authentication token found');
+                return null;
             }
 
             console.log('AuthService: Found token, making API request...');
@@ -172,7 +172,12 @@ class AuthService {
             console.log('AuthService: Profile API response status:', response.status);
 
             if (!response.ok) {
-                throw new Error('Failed to fetch profile');
+                if (response.status === 401) {
+                    // Token is invalid, remove it
+                    console.log('AuthService: Token is invalid, removing from localStorage');
+                    localStorage.removeItem('authToken');
+                }
+                throw new Error(`Failed to fetch profile: ${response.status}`);
             }
 
             const result = await response.json();
@@ -180,6 +185,10 @@ class AuthService {
             return result.user || result;
         } catch (error) {
             console.error('Error fetching profile:', error);
+            // Don't remove token on network errors, only on 401
+            if (error instanceof Error && error.message.includes('401')) {
+                localStorage.removeItem('authToken');
+            }
             return null;
         }
     }
